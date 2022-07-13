@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "785095550446",
+    "project_id": "atomidealizer-dc0db",
+    "storage_bucket": "atomidealizer-dc0db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:785095550446:android:b1da157cb25f1d30e15aff",
+        "android_client_info": {
+          "package_name": "com.atomidealizermoblieapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "785095550446-c8jbb2dqtl0t1rdve8q94pog25f6ujv0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAruGqyzeQJQY6ba6e8qlZ7kpbNysD98EU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "785095550446-c8jbb2dqtl0t1rdve8q94pog25f6ujv0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
