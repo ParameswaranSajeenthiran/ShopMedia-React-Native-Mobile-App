@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { View, Text, ImageBackground, Image, ScrollView } from 'react-native';
+import { View, Text, ImageBackground, Image, ScrollView ,TouchableOpacity} from 'react-native';
 import feedStyles from '../styles/feedStyles';
 import globalStyles from '../styles/globalStyles';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../utils/Dimensions';
 import { AuthContext } from './AuthContext';
 import firestore from '@react-native-firebase/firestore'
-import { TouchableOpacity } from 'react-native-gesture-handler';
 const POST = require("../assets/images/marina-abrosimova-_dcZHDd9puM-unsplash.jpg");
 const PROFILE_PIC = require("../assets/images/fray-bekele-EuzwQ8sIpNY-unsplash.jpg");
 
@@ -17,6 +16,7 @@ export default function ProfileScreen({route, navigation }) {
     const [loading, setLoading] = React.useState(true);
     const [deleted, setDeleted] = React.useState(false);
     const [userData, setUserData] = React.useState(null);
+  
 
     React.useEffect(() => {
         fetchPosts();
@@ -60,7 +60,13 @@ export default function ProfileScreen({route, navigation }) {
             });
     
           setPosts(list);
-    
+     
+          firestore()
+          .collection('users')    
+          .doc(user.uid).update({
+postImgs:list.map(item=>({id:item.id,img:item.postImg}))
+
+          })
           if (loading) {
             setLoading(false);
           }
@@ -85,12 +91,14 @@ House Of Fashion
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </Text>
             <View style={{flexDirection:'row',marginTop:20}}>
-            <View style={{marginHorizontal:5,marginVertical:5, width:SCREEN_WIDTH*0.4,backgroundColor:"#0077B5",height:SCREEN_HEIGHT*0.04,borderRadius:10,alignItems:'center',justifyContent:'center'}}>
+              <TouchableOpacity onPress={()=>logout()}>
+            <View  style={{marginHorizontal:5,marginVertical:5, width:SCREEN_WIDTH*0.4,backgroundColor:"#0077B5",height:SCREEN_HEIGHT*0.04,borderRadius:10,alignItems:'center',justifyContent:'center'}}>
                 <Text style={feedStyles.description}>
                     logout
                 </Text>
 
             </View>
+            </TouchableOpacity>
             <TouchableOpacity onPress={()=>navigation.navigate("editProfile")}>
             <View style={{marginHorizontal:5,marginVertical:5, width:SCREEN_WIDTH*0.4,backgroundColor:"#86888A",height:SCREEN_HEIGHT*0.04,borderRadius:10,alignItems:'center',justifyContent:'center'}}>
             <Text style={{...feedStyles.description,color:'black'}}>
@@ -127,10 +135,12 @@ FOLLOWING    </Text>
             </View>
             </View>
             <View style={{flexDirection:'row',width:SCREEN_WIDTH,justifyContent:'flex-start',flexWrap:"wrap"}} >
-                {posts.map((item) => (
-          <View >
-          <Image source={{uri:item.postImg}} style={{width:SCREEN_WIDTH/3,height:SCREEN_HEIGHT*0.2}}/>
-                          </View>
+                {posts.map((item,index) => (
+                  <TouchableOpacity onPress={() => navigation.navigate("BusinessFeedScreen", { userId: user.uid,index:index })}>
+                    <View >
+                      <Image source={{ uri: item.postImg }} style={{ width: SCREEN_WIDTH / 3, height: SCREEN_HEIGHT * 0.2 }} />
+                    </View>
+                  </TouchableOpacity>   
         ))}
  </View>
            

@@ -12,6 +12,7 @@ const POST = require("../assets/images/marina-abrosimova-_dcZHDd9puM-unsplash.jp
 import feedStyles from '../styles/feedStyles';
 // import StarRating from 'react-native-star-rating';
 import LinearGradient   from 'react-native-linear-gradient';
+import { Rating } from 'react-native-ratings';
 
 export default function FeedCard(props) {
     let item=props.item
@@ -57,11 +58,16 @@ export default function FeedCard(props) {
     <Text style={{...feedStyles.heading,fontSize:16}}>Rs .{item.price}</Text>
   
     <View style={feedStyles.rating}>
-        <MaterialIcon name="star" size={24}  color="white"/>
-        <MaterialIcon name="star" size={24}  color="white"/>
-        <MaterialIcon name="star" size={24}  color="white"/>
-        <MaterialIcon name="star" size={24}  color="white"/>
-        <MaterialIcon name="star" size={24}  color="white"/>
+    <Rating
+    type="custom"
+ style={{backgroundColor:'transparent'}}
+ ratingBackgroundColor={'white'}
+  ratingCount={5}
+startingValue={item.rating}
+  imageSize={30}
+//   showRating
+//   onFinishRating={ratingCompleted}
+/>
         <View style={{left:120}}>
         <Text style={feedStyles.description}>
             24k+ reviews

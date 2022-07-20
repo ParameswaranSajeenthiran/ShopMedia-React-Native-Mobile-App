@@ -18,6 +18,7 @@ import { FloatingAction } from "react-native-floating-action";
 import firestore from '@react-native-firebase/firestore'
 import ImagePicker from 'react-native-image-crop-picker';
 
+import GetLocation from 'react-native-get-location'
 
 
 export default function FeedScreen({ navigation }) {
@@ -38,26 +39,90 @@ export default function FeedScreen({ navigation }) {
       const actions = [
         {
            
-            icon:<MaterialIcon name="photo" size={48}/>,
+            icon:<MaterialIcon name="camera" size={48}/>,
             name: "takePhotoFromCamera",
             position: 4,
             color:"white",
+            buttonSize:60,
+            text:"Take Photo"
           
           },
       
         {
           
-          icon:<MaterialIcon name="camera" size={48}/>,
+          icon:<MaterialIcon name="image" size={48}/>,
           name: "choosePhotoFromLibrary",
           position: 4,
           color:"white",
+          buttonSize:60,
+          text:"Chose From Gallery"
+          
         
         }
       ];
 
       const [posts, setPosts] = React.useState(null);
       const [loading, setLoading] = React.useState(true);
+      const [location,setLocation]=React.useState({})
+      
 
+
+   async function getReviews (id)  {
+        try {
+         const list = [];
+     
+         await firestore()
+           .collection('reviews')
+          .where('post','==',id)
+           .get()
+           .then((querySnapshot) => {
+             console.log('Total revies: ', querySnapshot.size);
+     
+             querySnapshot.forEach((doc) => {
+               const {
+                 userId,
+                userImg,
+                 rating,
+                 review,
+                 userName,
+                 date
+                 
+                
+               } = doc.data();
+               list.push({
+                 id: doc.id,
+                 userId,
+             userName,
+                 userImg:userImg?userImg:  'https://lh5.googleusercontent.com/-b0PKyNuQv5s/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclxAM4M1SCBGAO7Rp-QP6zgBEUkOQ/s96-c/photo.jpg',
+                 date,
+                
+                 
+                 rating,
+                 review
+          
+               });
+             });
+             
+     let globalRatingSum=0
+             for (let i=0;i<list.length;i++){
+     globalRatingSum=globalRatingSum+list[i].rating
+    //  console.log(list[i].rating)
+             }
+            
+            //  console.log(userReview,list[0].date,"++++++++++++++++++++")
+            let reviews= [{rating:globalRatingSum/list.length,reviews:list.length}]
+            //  console.log(reviews)
+         return globalRatingSum
+           });
+     
+     
+         
+  
+         // console.log('Posts: ', posts);
+       } catch (e) {
+         console.log(e);
+       }
+       }
       const takePhotoFromCamera = () => {
 
         ImagePicker.openCamera({
@@ -106,14 +171,17 @@ export default function FeedScreen({ navigation }) {
                   userId,
                   title,
                   description,
-                  rating,
-                  reviews,
+                  
+                  
                   postImg,
                   postTime,
-                  price
+                  price,
+                  rating,
+                  review
                  
                 } = doc.data();
-                list.push({
+
+                 list.push({
                   id: doc.id,
                   userId,
                   userName: 'Test Name',
@@ -124,10 +192,15 @@ export default function FeedScreen({ navigation }) {
                   postImg,
                   liked: false,
                   rating,
-                  reviews,
+                  review,
+             
+                
                   description,
                   price
+              
                 });
+
+               
               });
             });
     
@@ -144,7 +217,23 @@ export default function FeedScreen({ navigation }) {
       };    
   React.useEffect(() => {
     fetchPosts();
-  }, []);
+    
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 15000,
+      })
+      .then(location => {
+        console.log(location);
+        // setUserData({...userData,location:{latitude:location.latitude,longitude:location.longitude}})
+        setLocation({latitude:location.latitude,longitude:location.longitude})
+      
+      })
+      .catch(error => {
+        const { code, message } = error;
+        console.warn(code, message);
+      })
+    
+  }, [navigation]);
     const renderItem = ({ item }) => (
         <FeedCard item={item}
         navigation={navigation} />
