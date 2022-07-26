@@ -25,16 +25,23 @@ export const AuthProvider = ({children}) => {
           try {
             await auth().createUserWithEmailAndPassword(email, password)
             .then(() => {
-              //Once the user creation has happened successfully, we can add the currentUser into firestore
-              //with the appropriate details.
-             console.log("logged in")
+              console.log('User account created & signed in!');
             })
-            //we need to catch the whole sign up process if it fails too.
             .catch(error => {
-                console.log('Something went wrong with sign up: ', error);
+              if (error.code === 'auth/email-already-in-use') {
+                throw 'The email address is already in use!'
+                console.log('That email address is already in use!');
+              }
+          
+              if (error.code === 'auth/invalid-email') {
+                throw error
+                console.log('That email address is invalid!');
+              }
+          
+              console.error(error);
             });
           } catch (e) {
-            console.log(e);
+            throw e
           }
         },
         logout: async () => {

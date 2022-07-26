@@ -1,18 +1,21 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, Text ,Button, TouchableOpacity,Image} from 'react-native';
+import { View, Text ,Button, TouchableOpacity,Image,Na} from 'react-native';
 const HOME_OUTLINE = require("../assets/icons/outline_home_black_24dp.png");
 const PROFILE_OUTLINE = require("../assets/icons/outline_account_circle_black_24dp.png");
 // import i from "../AS"
 const EXPLORE_OUTLINE = require("../assets/icons/outline_explore_black_24dp.png");
 
+import PushNotification, {Importance} from 'react-native-push-notification';
 
 const LOGO_IMAGE = require("../assets/icons/home.png");
 const PROFILE= require("../assets/icons/baseline_account_circle_black_24dp.png");
 const EXPLORE= require("../assets/icons/baseline_explore_black_24dp.png");
-const NOTIFICATION= require("../assets/icons/baseline_notifications_black_24dp.png");
+// const NOTIFICATION= require("../assets/icons/baseline_notifications_black_24dp.png");
+const NOTIFICATION= require("../assets/icons/notifiaction-count.jpg");
+
 const MENU= require("../assets/icons/baseline_menu_black_24dp.png");
 
 // import NOTIFICATION from './assets/icons/notification.svg'
@@ -29,8 +32,29 @@ const detailsName = "SearchScreen";
 const settingsName = "ProfileScreen";
 
 const Tab = createBottomTabNavigator();
-
 function BottomNavigationTab() {
+  const navigation = useNavigation(); 
+// 
+  const handlePushNotification=()=>{
+    PushNotification.localNotification({
+      message: "My Notification Message", // (required)
+      date: new Date(Date.now() + 60 * 1000), // in 60 secs
+      allowWhileIdle: false, //
+      channelId:'channel-id',
+      
+    }),
+    PushNotification.localNotificationSchedule({
+      //... You can use all the options from localNotifications
+      channelId:'channel-id',
+
+      message: "My Notification Message", // (required)
+      date: new Date(Date.now() + 6 * 1000), // in 60 secs
+      allowWhileIdle: false, // (optional) set notification to work while on doze, default: false
+    repeatTime:3,
+    
+  
+      /* Android Only Properties */
+    });    }
   return (
    
       <Tab.Navigator
@@ -44,7 +68,7 @@ function BottomNavigationTab() {
 
             if (rn === homeName) {
              return(
-             focused? <Image
+             focused? <Image 
               source={LOGO_IMAGE}
               style={{ width: 30, height: 30}} />:<Image
               source={HOME_OUTLINE}
@@ -92,15 +116,18 @@ function BottomNavigationTab() {
         </View>
           ),
           headerRight:()=>(
-          <View>
-              <Image
+            <TouchableOpacity onPress={()=>navigation.navigate("Notification")}>
+          <View  >
+              <Image 
               source={NOTIFICATION}
-              style={{ width: 24, height: 24, marginLeft: 12 }} />
+              style={{ width: 30, height: 30, marginLeft: 12 }} />
           </View>
-            
+         </TouchableOpacity>   
   )
         }}/>
-        <Tab.Screen name={detailsName} component={SearchScreen} />
+        <Tab.Screen name={detailsName} component={SearchScreen} options={{
+          headerShown:false
+        }} />
         <Tab.Screen name={settingsName} component={ProfileScreen}
         options={{
           headerShown:false

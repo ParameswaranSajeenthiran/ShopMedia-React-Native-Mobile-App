@@ -34,17 +34,18 @@ export default function ProductScreen({route, navigation}){
     React.useEffect(()=>{
 console.log("triggred",post.id)
 
-        getUser();
+        
         getReviews();
         getPost();
        
-    },[editReview]
-    
-       
-         
-         
-         
-      )  
+    },[editReview])  
+    React.useEffect(()=>{
+      getUser();
+    },[])
+      React.useEffect(()=>{
+        getPost();
+        getReviews();
+      },[review])
     
       const getPost = async () => {
         try {
@@ -114,7 +115,7 @@ let globalRatingSum=0
 globalRatingSum=globalRatingSum+list[i].rating
         }
         setGlobalRating(globalRatingSum/list.length)
-        // console.log(userReview,list[0].date,"++++++++++++++++++++")
+        console.log(userReview,list[0].date,"++++++++++++++++++++")
         setUserReview(userReview)
     
         setReviews(list);
@@ -142,7 +143,7 @@ globalRatingSum=globalRatingSum+list[i].rating
       }
     const submitReview = async () => {
         console.log(rating,review)
-
+        setEditReview(false)
         firestore()
         .collection('reviews')
              . add({rating:rating,date:new Date().toISOString(), review:review,userId:userData.userId,userImg:userData.userImg,userName:userData.name,post:post.id})
@@ -156,12 +157,17 @@ globalRatingSum=globalRatingSum+list[i].rating
           .update({
             rating:((postX.rating*reviews.length)+rating)/(reviews.length+1),
             reviews:postX.reviews+1
-          }) 
+          }).then(()=>{
+            getReviews()
+            getPost();
+          })
             console.log(post.id)
             console.log(res)
-          setEditReview(false)
+         
         })
-    }
+    
+
+      }
 
     const updateReview = async () => {
         setEditReview(false)
@@ -183,6 +189,8 @@ globalRatingSum=globalRatingSum+list[i].rating
             rating:((postX.rating*reviews.length)-userReview[0].rating+rating)/(reviews.length)
             
 
+          }).then(()=>{
+            getPost()
           })
             console.log(post.id)
             console.log(res)
@@ -216,6 +224,7 @@ setRating(rating)
  style={{backgroundColor:'transparent'}}
  ratingBackgroundColor={'transparent'}
   ratingCount={5}
+  readonly={true}
 startingValue={postX?postX.rating:0}
   imageSize={30}
 //   showRating
@@ -351,7 +360,7 @@ startingValue={0}
       onFinishRating={ratingCompleted}           
     />
             <View >
-            <Text style={{color:'black',marginLeft:5,marginVertical:10}}>
+            <Text style={{marginLeft:5,marginVertical:10}}>
             {/* { JSON.stringify( item.date)} */}
             {item.date.slice(0,10)}
             </Text>
@@ -366,108 +375,7 @@ startingValue={0}
        
         </View>
          )):null}
-       <View style={{marginVertical:20}}>
-         <View style={feedStyles.userInfo}>
-                <Image source={PROFILE_PIC} style={feedStyles.userImg}>
-
-                </Image>
-                <View style={feedStyles.userName}>
-                    <Text style={feedStyles.userNameText}>
-                        House of Fashion 
-                    </Text>
-
-                </View>
-                
-                
-                
-            </View> 
-            <View style={{flexDirection:'row'}}>
-        <MaterialIcon name="star" size={24}  color="gold"/>
-        <MaterialIcon name="star" size={24}  color="gold"/>
-        <MaterialIcon name="star" size={24}  color="black"/>
-        <MaterialIcon name="star" size={24}  color="black"/>
-        <View >
-        <Text style={{color:'black',marginLeft:5}}>
-           12/3/2022
-        </Text>
-
-    </View>
- 
-    </View> 
-  
-    <Text>
-    Had concerns that this would be too long, and couldn't easily be shortened due to trim, but the size 10 put the trim right at my knees (I'm 5'1 1/2"). Fits well, even through bust, which is usually too tight in a size 10. Gorgeous color and very flattering. If any are left, get one before they're gone.
-Toni3926, CA
-    </Text>
-    </View> 
-    <View style={{marginVertical:20}}>
-         <View style={feedStyles.userInfo}>
-                <Image source={PROFILE_PIC} style={feedStyles.userImg}>
-
-                </Image>
-                <View style={feedStyles.userName}>
-                    <Text style={feedStyles.userNameText}>
-                        House of Fashion 
-                    </Text>
-
-                </View>
-                
-                
-                
-            </View> 
-            <View style={{flexDirection:'row'}}>
-        <MaterialIcon name="star" size={24}  color="gold"/>
-        <MaterialIcon name="star" size={24}  color="gold"/>
-        <MaterialIcon name="star" size={24}  color="black"/>
-        <MaterialIcon name="star" size={24}  color="black"/>
-        <View >
-        <Text style={{color:'black',marginLeft:5}}>
-           12/3/2022
-        </Text>
-
-    </View>
- 
-    </View> 
-  
-    <Text>
-    Had concerns that this would be too long, and couldn't easily be shortened due to trim, but the size 10 put the trim right at my knees (I'm 5'1 1/2"). Fits well, even through bust, which is usually too tight in a size 10. Gorgeous color and very flattering. If any are left, get one before they're gone.
-Toni3926, CA
-    </Text>
-    </View> 
-    <View style={{marginVertical:20}}>
-         <View style={feedStyles.userInfo}>
-                <Image source={PROFILE_PIC} style={feedStyles.userImg}>
-
-                </Image>
-                <View style={feedStyles.userName}>
-                    <Text style={feedStyles.userNameText}>
-                        House of Fashion 
-                    </Text>
-
-                </View>
-                
-                
-                
-            </View> 
-            <View style={{flexDirection:'row'}}>
-        <MaterialIcon name="star" size={24}  color="gold"/>
-        <MaterialIcon name="star" size={24}  color="gold"/>
-        <MaterialIcon name="star" size={24}  color="black"/>
-        <MaterialIcon name="star" size={24}  color="black"/>
-        <View >
-        <Text style={{color:'black',marginLeft:5}}>
-           12/3/2022
-        </Text>
-
-    </View>
- 
-    </View> 
-  
-    <Text>
-    Had concerns that this would be too long, and couldn't easily be shortened due to trim, but the size 10 put the trim right at my knees (I'm 5'1 1/2"). Fits well, even through bust, which is usually too tight in a size 10. Gorgeous color and very flattering. If any are left, get one before they're gone.
-Toni3926, CA
-    </Text>
-    </View> 
+     
     </View>  
          </ScrollView>
             </View>

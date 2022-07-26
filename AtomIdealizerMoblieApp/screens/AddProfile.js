@@ -12,117 +12,44 @@ import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import GetLocation from 'react-native-get-location'
 import  Icon from 'react-native-vector-icons/Ionicons';
+import * as Animatable from 'react-native-animatable';
 
+// import AsyncStorage from '@react-native-async-storage/async-storage/lib/typescript/AsyncStorage';
 // import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RBSheet from 'react-native-raw-bottom-sheet';
 import MapView, { Marker } from 'react-native-maps';
 import feedStyles from '../styles/feedStyles';
-import { useFocusEffect } from '@react-navigation/native';
-import styles from './SignUpScreen'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function AddProfile({ route, navigation } ){
-    const [category,setCategory]=useState(null);
-  
+    const [name,setName]=useState("");
+    const [category,setCategory]=useState("");
+    const [description,setDescription]=useState("");
+    const [website,setWebsite]=useState("");
  
     const refRBSheet = useRef();
         const[isBottomSheetVisible,setIsBottomSHeetVisible]=useState(false)
     const [open, setOpen] = useState(false);
-    const [uploading, setUploading] = useState(false);
-
+    const [form,setForm]=useState({})
+      
      const {user, logout} = useContext(AuthContext);
   const [image, setImage] = useState(null);
   const[backgroundImg,setBackgroundImage]=useState(null);
   const[isBackgroundImageUpload,setIsBackgroundImageUpload]=useState(false)
+  const [uploading, setUploading] = useState(false);
   const [transferred, setTransferred] = useState(0);
-  const [userData, setUserData] = useState({});
-  const [location,setLocation ]=useState(null)
-const{initialUserData}=route.params
-useEffect(()=>{
-// getUser();
-console.log(userData,"useEffect")
-
-// navigation.setOptions({
-//   // title: 'POST',
-//   headerRight:()=>(
-
-//     // <TouchableOpacity onPress={()=>handleUpdate()}>
-//     // <View>
-//     //  <Text>
-//     //    Upload
-//     //  </Text>
-//     // </View>
-//     // </TouchableOpacity>
-
-//   )})
-
-   GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 15000,
-    })
-    .then(location => {
-      console.log(location);
-      // setUserData({...userData,location:{latitude:location.latitude,longitude:location.longitude}})
-      setLocation({latitude:location.latitude,longitude:location.longitude})
-    
-    })
-    .catch(error => {
-      const { code, message } = error;
-      console.warn(code, message);
-    })
-},[])
-//   useFocusEffect(
-//     React.useCallback(() => {    
-     
-// console.log(getUser())
-
-// navigation.setOptions({
-//   // title: 'POST',
-//   headerRight:()=>(
-
-//     <TouchableOpacity onPress={()=>handleUpdate()}>
-//     <View>
-//      <Text>
-//        Upload
-//      </Text>
-//     </View>
-//     </TouchableOpacity>
-
-//   )})
-// console.log(user)
-// GetLocation.getCurrentPosition({
-//   enableHighAccuracy: true,
-//   timeout: 15000,
-// })
-// .then(location => {
-//   console.log(location);
-//   // setUserData({...userData,location:{latitude:location.latitude,longitude:location.longitude}})
-//   setLocation({latitude:location.latitude,longitude:location.longitude})
-
-// })
-// .catch(error => {
-//   const { code, message } = error;
-//   console.warn(code, message);
-// }) },[]))
+  const[error,setError]=useState(true)
+  const [userData, setUserData] =React. useState({
+    name:' ',
+    website:null,
+    description:null});  const [location,setLocation ]=useState({})
+  const [loading, setLoading] = useState(true); 
 //   useEffect(()=>{
 
 
 // getUser()
-
-// navigation.setOptions({
-//   // title: 'POST',
-//   headerRight:()=>(
-
-//     <TouchableOpacity onPress={()=>handleUpdate()}>
-//     <View>
-//      <Text>
-//        Upload
-//      </Text>
-//     </View>
-//     </TouchableOpacity>
-
-//   )})
-// console.log(user)
 // GetLocation.getCurrentPosition({
 //   enableHighAccuracy: true,
 //   timeout: 15000,
@@ -137,47 +64,58 @@ console.log(userData,"useEffect")
 //   const { code, message } = error;
 //   console.warn(code, message);
 // })
-//   },[navigation])
 
 
-  const getUser = async() => {
-    const currentUser = await firestore()
-    .collection('users')
-    .doc(user.uid)
-    .get()
-    .then((documentSnapshot) => {
-      if( documentSnapshot.exists ) {
-        console.log('User Data', documentSnapshot.data());
-        setUserData(documentSnapshot.data());
-       
-        console.log("userDAta",userData)
-      }
+//   },[])
+  // const getUser = async() => {
+  //   const currentUser = await firestore()
+  //   .collection('users')
+  //   .doc(user.uid)
+  //   .get()
+  //   .then((documentSnapshot) => {
+  //     if( documentSnapshot.exists ) {
+  //       navigation.navigate("BottomTabNavigation")
+  //       // console.log('User Data', documentSnapshot.data());
+  //       // setUserData(documentSnapshot.data());
+  //     }
+  //   })
+  // }
 
-    })
-  }
+useEffect(()=>{
 
-
-  const handleUpdate = async() => {
+//  getUser();
+ 
+  console.log(user)
+  GetLocation.getCurrentPosition({
+    enableHighAccuracy: true,
+    timeout: 15000,
+  })
+  .then(location => {
+    console.log(location);
+    setUserData({...userData,location:{latitude:location.latitude,longitude:location.longitude}})
+    setLocation({latitude:location.latitude,longitude:location.longitude})
+  
+  })
+  .catch(error => {
+    const { code, message } = error;
+    console.warn(code, message);
+  })
+},[])
+  const handleUpdate = async(userData1) => {
+if(userData.name==" "){
+  setError("Please provide a name for your business")
+}
+    // AsyncStorage.setItem('location', location);
     let imgUrl = await uploadImage(image);
     let backgroundImgUrl = await uploadImage(backgroundImg);
-console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
-    if(imgUrl==null && initialUserData.userImg!==null){
-      imgUrl=initialUserData.userImg
-    }
-
-
-    if(backgroundImgUrl==null && initialUserData.backgroundImgUrl!==null){
-      backgroundImgUrl=initialUserData.backgroundImgUrl
-    }
 
     console.log({
       userId:user.uid,
-      name:userData.name?userData.name:initialUserData.name,
-      website:userData.website?userData.website:initialUserData.website,
-     category:userData.category?userData.category:initialUserData.category,
-     description:userData.description?userData.description:initialUserData.description,
+      name:userData1.name,
+      website:userData1.website,
+     category:category,
+     description:userData1.description,
       userImg: imgUrl,
-      backgroundImgUrl:backgroundImgUrl,
       location:location
     })
     // if( imgUrl == null && userData.userImg ) {
@@ -189,26 +127,28 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
     firestore()
     .collection('users'). 
     doc(user.uid).   
-    update({
+    set({
       userId:user.uid,
-      name:userData.name?userData.name:initialUserData.name,
-      website:userData.website?userData.website:initialUserData.website,
-     category:userData.category?userData.category:initialUserData.category,
-     description:userData.description?userData.description:initialUserData.description,
+      name:userData1.name,
+      website:userData1.website,
+     category:category,
+     description:userData1.description,
       userImg: imgUrl,
       backgroundImgUrl:backgroundImgUrl,
       location:location,
-      keySearchWords:userData.keySearchWords
+      followers:[],
+      following:[],
+      posts:[]
     })
     .then(() => {
-      console.log('User Updated!');
+      // console.log('User Updated!');
       // Alert.alert(
       //   'Profile Updated!',
       //   'Your profile has been updated successfully.'
       // );
-      navigation.navigate("ProfileScreen")
+       AsyncStorage.setItem('signedUp', 'false');
+      navigation.navigate("BottomTabNavigation")
     }).catch((e)=>{
-      console.log(userData)
       console.log(e,"________________________________________")
     })
   }
@@ -260,7 +200,8 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
     const [items, setItems] = useState([
         {label: 'Saloon', value: 'saloon'},
         {label: 'Fashion', value: 'fashion'},
-        {label:'Food',value:'food'}
+        {label: 'Food', value: 'food'},
+        {label: 'Customer', value: 'customer'}
       ]);
       DropDownPicker.setListMode("SCROLLVIEW")
 
@@ -304,10 +245,10 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
           setUploading(false);
           setImage(null);
     
-          // Alert.alert(
-          //   'Image uploaded!',
-          //   'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
-          // );
+          Alert.alert(
+            'Image uploaded!',
+            'Your image has been uploaded to the Firebase Cloud Storage Successfully!',
+          );
           return url;
     
         } catch (e) {
@@ -316,13 +257,14 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
         }
     
       };
+     
     return(
-        <View style={{flex:1,backgroundColor:'white',alignContent:'center'}}>
-            <ScrollView>
-           <ImageBackground source={backgroundImg!=null ?{ uri: backgroundImg}:(initialUserData?{uri:initialUserData.backgroundImgUrl}:PROFILE_PIC)} style={{width:SCREEN_WIDTH,height:SCREEN_HEIGHT*0.2}}>
+        <View style={{flex:1,backgroundColor:'white'}}>
+            {/* <ScrollView> */}
+           <ImageBackground  source={ backgroundImg?{ uri: backgroundImg}:POST} style={{width:SCREEN_WIDTH,height:SCREEN_HEIGHT*0.2}}>
       
 
-            <Image  source={image?{ uri: image}:(initialUserData?{uri:initialUserData.userImg}:PROFILE_PIC)}  borderRadius={100} style={{width:150,height:150,alignSelf:'center',justifyContent:'flex-end',top:100, borderWidth:5,borderColor:'white'}}/>
+            <Image  source={ image?{ uri: image}:PROFILE_PIC}  borderRadius={100} style={{width:150,height:150,alignSelf:'center',justifyContent:'flex-end',top:100, borderWidth:5,borderColor:'white'}}/>
             <Icon onPress={() => {refRBSheet.current.open()}} style={{alignSelf:'center',top:50,left:60}} name='camera' size={48}/>
             </ImageBackground>
                     <Icon onPress={() => {refRBSheet.current.open()
@@ -337,28 +279,27 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
                          <MaterialIcons name='business-outline' />
                         Business Name</Text>
                         
-                    <TextInput name="name" value={userData.name?userData.name:initialUserData.name} onChangeText={(txt) => setUserData({...userData, name: txt})}style={{borderBottomWidth:1,padding:2}} placeholder='Business Name'></TextInput>
+                    <TextInput name="name" value={userData?userData.name:null} onChangeText={(txt) => {setUserData({...userData, name: txt})
+                  console.log(txt,userData)}}style={{borderBottomWidth:1,padding:2}} placeholder='Business Name'></TextInput>
                 </View>
+                { error? null : 
+            <Animatable.View animation="fadeInLeft" duration={500}>
+            <Text style={styles.errorMsg}>Please provi</Text>
+            </Animatable.View>
+            }
                 <View style={{marginVertical:10}}>
                    
                     <Text>                
                          <MaterialIcons name='business-outline' />
                         Business description</Text>
-                    <TextInput multiline={true} value={userData.description?userData.description:initialUserData.description} onChangeText={(txt) => setUserData({...userData, description: txt})}style={{borderBottomWidth:1,padding:2,minHeight:20}} placeholder='Business Description'></TextInput>
+                    <TextInput multiline={true}  value={userData?userData.description:null}onChangeText={(txt) => setUserData({...userData, description: txt})}style={{borderBottomWidth:1,padding:2,minHeight:20}} placeholder='Business Description'></TextInput>
                 </View>
                 <View style={{marginVertical:10}}>
                    
                    <Text>                
                         <MaterialIcons name='business-outline' />
                        Business Website</Text>
-                   <TextInput  value={userData.website?userData.website:initialUserData.website} onChangeText={(txt) => setUserData({...userData, website: txt})} style={{borderBottomWidth:1,padding:2}} placeholder='Business Website'></TextInput>
-               </View>
-               <View style={{marginVertical:10}}>
-                   
-                   <Text>                
-                        <MaterialIcons name='business-outline' />
-                       Key Search Words</Text>
-                   <TextInput  value={userData.keySearchWords?userData.keySearchWords:initialUserData.keySearchWords} onChangeText={(txt) => setUserData({...userData, keySearchWords: txt})} style={{borderBottomWidth:1,padding:2}} placeholder='Business Website'></TextInput>
+                   <TextInput  value={userData?userData.website:null}onChangeText={(txt) => setUserData({...userData, website: txt})} style={{borderBottomWidth:1,padding:2}} placeholder='Business Website'></TextInput>
                </View>
                 <View style={{marginVertical:10}}>
                    
@@ -376,56 +317,53 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
       setOpen={setOpen}
       setValue={setCategory} 
       setItems={setItems}/>
-           <View style={{marginVertical:10}}> 
-                   
-                   <Text>                
-                        <MaterialIcons name='business-outline' />
-                      Location</Text>
-                     
-                   {/* <TextInput style={{borderBottomWidth:1,padding:2}} placeholder='Business Name'></TextInput> */}
-               </View>    
-            </View>
-            {/* <MapView
+      
+      <TouchableOpacity onPress={()=>handleUpdate(userData)}>
+
+<View style={{width:SCREEN_WIDTH-20,backgroundColor:"#0077B5",height:SCREEN_HEIGHT*0.06,borderRadius:50,alignItems:'center',marginVertical:10}}>
             
-                   style={mapStyles.map}
-                   initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0,
-                    longitudeDelta: 0.0,
-                }}
-                   >
-              <Marker
+      {uploading? <View>
+        <Text>{transferred} % Completed!</Text>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>:  <Text style={{fontSize:24,fontWeight:"bold",color:'white',marginVertical:5}}> Save changes</Text>} 
+         
+      
+</View>
+</TouchableOpacity>
+            {/* <View style={{ marginVertical: 10 }}> */}
+              {/* <Text>
+                <MaterialIcons name='business-outline' />
+                Location
+              </Text> */}
+
+              {/* <TextInput style={{borderBottomWidth:1,padding:2}} placeholder='Business Name'></TextInput> */}
+            {/* </View>     */}
+            </View>
+          {/* <MapView
+
+            style={mapStyles.map}
+            initialRegion={{
+              latitude: 37.78825,
+              longitude: -122.4324,
+              latitudeDelta: 0.0,
+              longitudeDelta: 0.0,
+            }}
+          >
+            <Marker
               coordinate={{
                 latitude: 37.78825,
                 longitude: -122.4324
               }}>
-                 <Image source={PROFILE_PIC} style={feedStyles.userImg}>
+              <Image source={PROFILE_PIC} style={feedStyles.userImg}>
 
-</Image>
-              </Marker>
-            </MapView> */}
-    
-          
-    <TouchableOpacity onPress={()=>handleUpdate()}>
-
-    <View style={{width:SCREEN_WIDTH-20,backgroundColor:"#0077B5",height:SCREEN_HEIGHT*0.06,borderRadius:50,alignItems:'center'}}>
-                
-          {uploading? <View>
-            <Text>{transferred} % Completed!</Text>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>:  <Text style={{fontSize:24,fontWeight:"bold",color:'white',marginVertical:5}}> Save changes</Text>} 
-             
-          
- </View>
- </TouchableOpacity>
-
- 
+              </Image>
+            </Marker>
+          </MapView> */}
             <RBSheet
          ref={refRBSheet}
           height={100}
           openDuration={250}
-          customStyles={{ 
+          customStyles={{
             container: {
               justifyContent: "center",
               alignItems: "flex-start"
@@ -457,22 +395,23 @@ console.log("inmg",imgUrl,"initialUserData",backgroundImgUrl)
             {/* </TouchableOpacity> */}
             </View>
         </RBSheet>
-            </ScrollView>
+            {/* </ScrollView> */}
            
         </View>
     )
 }
-const mapStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     
     height: SCREEN_HEIGHT,
-    width: SCREEN_WIDTH-40,
-    justifyContent: 'center',
+    width: SCREEN_WIDTH,
+    justifyContent: 'flex-end',
     alignItems: 'center',
-  },
+  },   errorMsg: {
+    color: '#FF0000',
+    fontSize: 14,
+},
   map: {
-    height: SCREEN_HEIGHT*0.4,
-    width:SCREEN_WIDTH-40,
-    marginHorizontal:20
+    height: SCREEN_HEIGHT*0.6
     // ...StyleSheet.absoluteFillObject,
   },})

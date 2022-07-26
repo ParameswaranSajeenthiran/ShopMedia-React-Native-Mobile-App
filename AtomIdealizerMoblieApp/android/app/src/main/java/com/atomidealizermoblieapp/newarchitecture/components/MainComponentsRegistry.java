@@ -1,4 +1,4 @@
-package com.atomidealizermoblieapp.newarchitecture.components;
+package com.shopmedia.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

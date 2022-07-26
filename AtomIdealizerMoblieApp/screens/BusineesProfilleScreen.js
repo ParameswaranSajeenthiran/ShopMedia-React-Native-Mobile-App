@@ -1,55 +1,81 @@
 import * as React from 'react';
-import { View, Text, ImageBackground, Image, ScrollView ,TouchableOpacity} from 'react-native';
+import { View, Text, ImageBackground, Image, ScrollView } from 'react-native';
 import feedStyles from '../styles/feedStyles';
 import globalStyles from '../styles/globalStyles';
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from '../utils/Dimensions';
 import { AuthContext } from './AuthContext';
 import firestore from '@react-native-firebase/firestore'
-import { useFocusEffect } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { AirbnbRating, Rating } from 'react-native-ratings';
 const POST = require("../assets/images/marina-abrosimova-_dcZHDd9puM-unsplash.jpg");
 const PROFILE_PIC = require("../assets/images/fray-bekele-EuzwQ8sIpNY-unsplash.jpg");
 
-export default function ProfileScreen({route, navigation }) {
+export default function BusinessProfileScreen({route, navigation }) {
 
     const {user, logout} = React.useContext(AuthContext);
 
     const [posts, setPosts] = React.useState([]);
     const [loading, setLoading] = React.useState(true);
     const [deleted, setDeleted] = React.useState(false);
-    const [userData, setUserData] = React.useState(null);
-  
-    useFocusEffect(
-      React.useCallback(() => {     getUser();
-        fetchPosts();
-        navigation.addListener("focus", () => setLoading(!loading)); },[]))
-      //   React.useEffect(() => {
-      // getUser();
-      //   fetchPosts();
-      //   navigation.addListener("focus", () => setLoading(!loading));
-      // }, [navigation]);
+    const [userData, setUserData] = React.useState({});
+    const[update,setUpdate]=React.useState(true)
+    const{userId}=route.params
 
-      const getUser = async() => {
-        const currentUser = await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .get()
-        .then((documentSnapshot) => {
-          console.log(user.uid)
-          if( documentSnapshot.exists ) {
-            console.log('User Data', documentSnapshot.data());
-            setUserData(documentSnapshot.data());
-          }
-        })
+    React.useEffect(() => {
+      
+        fetchPosts();
+        getUser();
+        navigation.addListener("focus", () => setLoading(!loading));
+      }, [navigation, update]);
+
+      const follow = async() => {
+        if(userData.followers.includes(user.uid)){
+          firestore()
+      .collection('users'). 
+      doc(userData.userId).   
+      update({followers:firestore.FieldValue.arrayRemove(user.uid)})
+
+      firestore()
+      .collection('users'). 
+      doc(user.uid).   
+      update({following:firestore.FieldValue.arrayRemove(userId)})
+
+
+        }
+        else{
+      firestore()
+      .collection('users'). 
+      doc(userData.userId).   
+      update({followers:firestore.FieldValue.arrayUnion(user.uid)})
+
+      firestore()
+      .collection('users'). 
+      doc(user.uid).   
+      update({following:firestore.FieldValue.arrayUnion(userId)})
+
       }
     
+    setUpdate(!update)}
+        const getUser = async() => {
+    const currentUser = await firestore()
+    .collection('users')
+    .doc(userId)
+    .get()
+    .then((documentSnapshot) => {
+      if( documentSnapshot.exists ) {
+        console.log('User Data', documentSnapshot.data());
+        setUserData(documentSnapshot.data());
+      }
+    })
+  }
     const fetchPosts = async () => {
         try {
           const list = [];
     
           await firestore()
             .collection('posts')
-            .where('userId', '==', user.uid)
-            .orderBy('postTime', 'desc').limit(6)
+            .where('userId', '==',userId)
+            .orderBy('postTime', 'desc')
             .get()
             .then((querySnapshot) => {
               // console.log('Total Posts: ', querySnapshot.size);
@@ -105,35 +131,39 @@ postImgs:list.map(item=>({id:item.id,img:item.postImg}))
             </ImageBackground>
 <View style={{marginTop:60,alignItems:'center',padding:10}}>
             <Text style={{fontSize:24,color:'black',fontWeight:'bold'}}>
-{userData?userData.name:null}
+{userData?userData.name:""}
             </Text>
             <Text>
-{userData?userData.description:null}
+            { userData?userData.description:""}
             </Text>
             <View style={{flexDirection:'row',marginTop:20}}>
-              <TouchableOpacity onPress={()=>logout()}>
+              <TouchableOpacity onPress={()=>follow()}>
             <View  style={{marginHorizontal:5,marginVertical:5, width:SCREEN_WIDTH*0.4,backgroundColor:"#0077B5",height:SCREEN_HEIGHT*0.04,borderRadius:10,alignItems:'center',justifyContent:'center'}}>
                 <Text style={feedStyles.description}>
-                    logout
+                  {userData.followers?userData.followers.includes(user.uid)?"UnFollow":"follow":null}
                 </Text>
 
             </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={()=>navigation.navigate("editProfile",{
-              initialUserData:userData
-            })}>
-            <View style={{marginHorizontal:5,marginVertical:5, width:SCREEN_WIDTH*0.4,backgroundColor:"#86888A",height:SCREEN_HEIGHT*0.04,borderRadius:10,alignItems:'center',justifyContent:'center'}}>
-            <Text style={{...feedStyles.description,color:'black'}}>
-               Analyze
-            </Text>
+            
+          
             </View>
-            </TouchableOpacity>
-            </View>
+            <AirbnbRating
+ style={{backgroundColor:'white',marginVertical:10}}
+ reviews={[ "Terrible","Bad","Good", "Very Good", "Awesome"]}
+defaultRating={0}
+  // ratingCount={5}
+startingValue={0}
+  imageSize={60}
+  // readonly={true}
+  showRating
+  // onFinishRating={ratingCompleted}
+/>
             <View style={{flexDirection:'row',marginVertical:20}}>
 <View style={{marginHorizontal:10}}>
 <Text style={{...globalStyles.heading,alignSelf:'center'}}>
-{posts.length}   
- </Text>
+       {posts.length}
+    </Text>
     <Text>
         POSTS
     </Text>
@@ -141,15 +171,15 @@ postImgs:list.map(item=>({id:item.id,img:item.postImg}))
 
 <View style={{marginHorizontal:30}}>
 <Text style={{...globalStyles.heading,alignSelf:'center'}}>
-{userData?userData.following.length:0}
-
+       {userData.following?userData.following.length:0}
     </Text>
     <Text>
 FOLLOWING    </Text>
 </View>
 <View style={{marginHorizontal:10}}>
 <Text style={{...globalStyles.heading,alignSelf:'center'}}>
-{userData?userData.followers.length:0}    </Text>
+        {userData.followers?userData.followers.length:0}
+    </Text>
     <Text>
         Customers
     </Text>
@@ -158,11 +188,11 @@ FOLLOWING    </Text>
             </View>
             <View style={{flexDirection:'row',width:SCREEN_WIDTH,justifyContent:'flex-start',flexWrap:"wrap"}} >
                 {posts.map((item,index) => (
-                  <TouchableOpacity onPress={() => navigation.navigate("BusinessFeedScreen", { userId: user.uid,index:index })}>
-                    <View >
-                      <Image source={{ uri: item.postImg }} style={{ width: SCREEN_WIDTH / 3, height: SCREEN_HEIGHT * 0.2 }} />
-                    </View>
-                  </TouchableOpacity>   
+             <TouchableOpacity onPress={() => navigation.navigate("BusinessFeedScreen", { userId:item.userId,index:index })}>
+             <View >
+               <Image source={{ uri: item.postImg }} style={{ width: SCREEN_WIDTH / 3, height: SCREEN_HEIGHT * 0.2 }} />
+             </View>
+           </TouchableOpacity>   
         ))}
  </View>
            

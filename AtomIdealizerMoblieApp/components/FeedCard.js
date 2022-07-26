@@ -2,7 +2,7 @@ import * as React from 'react';
 import { View, Text,Image, Dimensions, ImageBackground, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import NOTIFICATION from '../assets/icons/home.svg'
-import { AuthContext } from './AuthContext';
+import { AuthContext } from '../screens/AuthContext';
 import MaterialIcon from 'react-native-vector-icons/Ionicons'
 const LOGO_IMAGE = require("../assets/icons/home.png");
 const windowWidth=Dimensions.get('screen').width;
@@ -15,18 +15,27 @@ import LinearGradient   from 'react-native-linear-gradient';
 import { Rating } from 'react-native-ratings';
 
 export default function FeedCard(props) {
+  const {user,logout}=React.useContext(AuthContext)
+
     let item=props.item
     return (
         <View onPress={()=>props.navigation.navigate("Product")}>
         <View  style={feedStyles.card}>     
-            
+        <TouchableOpacity onPress={()=>{
+    if(user.uid==item.userId){
+    props.  navigation.navigate("ProfileScreen")
+    }else{
+    
+    props.navigation.navigate("businessProfileScreen",{
+    userId:item.userId
+  })}}}>    
            <View style={feedStyles.userInfo}>
-                <Image source={{uri:item.userImg}} style={feedStyles.userImg}>
+                <Image source={item.userImg?{uri:item.userImg}:require('../assets/logo.png')} style={feedStyles.userImg}>
 
                 </Image>
                 <View style={feedStyles.userName}>
                     <Text style={feedStyles.userNameText}>
-                        {item.userName}
+                        {item?item.userName:null}
                     </Text>
 
                 </View>
@@ -34,10 +43,11 @@ export default function FeedCard(props) {
                 
                 
             </View>   
+            </TouchableOpacity>
             <ImageBackground
          borderRadius={50}
     style={{width : windowWidth-20, height: windowHeight*0.5,borderRadius:50}}
-    source={{uri:item.postImg}}> 
+    source={{uri:item?item.postImg:null}}> 
      {/* <LinearGradient 
     colors={['#00000000', '#6D6B6B']} 
     style={{height : '100%', width : '100%'}}>
@@ -53,9 +63,9 @@ export default function FeedCard(props) {
     <Text style={{fontWeight:'bold',color:'black'}}>View Reviews</Text>
     </TouchableOpacity>     
    <View style={{position:'relative',top:250,marginHorizontal:10}}>
-    <Text style={{...feedStyles.heading}}>{item.title}</Text>
-    <Text style={{...feedStyles.heading,fontSize:16}}>The Latest Collection of fashion in one place,The Latest Collection of fashion.</Text>
-    <Text style={{...feedStyles.heading,fontSize:16}}>Rs .{item.price}</Text>
+    <Text style={{...feedStyles.heading}}>{item?item.title:null}</Text>
+    <Text style={{...feedStyles.heading,fontSize:16}}>{item?item.description:null}</Text>
+    {/* <Text style={{...feedStyles.heading,fontSize:16}}>Rs .{item?item.price:null}</Text> */}
   
     <View style={feedStyles.rating}>
     <Rating
@@ -63,14 +73,15 @@ export default function FeedCard(props) {
  style={{backgroundColor:'transparent'}}
  ratingBackgroundColor={'white'}
   ratingCount={5}
-startingValue={item.rating}
+  readonly={true}
+startingValue={item?item.rating:null}
   imageSize={30}
 //   showRating
 //   onFinishRating={ratingCompleted}
 />
         <View style={{left:120}}>
         <Text style={feedStyles.description}>
-            24k+ reviews
+            {item?item.review?item.review+"reviews":null:null} 
         </Text>
     </View>
     </View>

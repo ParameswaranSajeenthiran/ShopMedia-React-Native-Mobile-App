@@ -7,11 +7,11 @@
 #define TIMEOUT_SECONDS 600
 #define TEXT_TO_LOOK_FOR @"Welcome to React"
 
-@interface AtomIdealizerMoblieAppTests : XCTestCase
+@interface shopmediaTests : XCTestCase
 
 @end
 
-@implementation AtomIdealizerMoblieAppTests
+@implementation shopmediaTests
 
 - (BOOL)findSubviewInView:(UIView *)view matching:(BOOL (^)(UIView *view))test
 {

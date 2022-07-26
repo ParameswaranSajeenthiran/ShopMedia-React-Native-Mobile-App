@@ -14,6 +14,7 @@ borderRadius:50,
 },
 userInfo:{
     flexDirection:'row',
+    
    
 
 },
@@ -24,7 +25,7 @@ userImg:{
 
 },userName:{
 marginLeft:10,
-flexDirection:'row'
+flexDirection:'column'
 },
 userNameText:{
     fontWeight:"bold",

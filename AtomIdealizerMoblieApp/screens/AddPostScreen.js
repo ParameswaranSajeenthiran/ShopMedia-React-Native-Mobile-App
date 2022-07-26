@@ -36,11 +36,11 @@ export default function AddPostScreen({ route, navigation }) {
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("")
   const [price, setPrice] = React.useState(null)
-
+  const [loading, setLoading] =React. useState(true);
   const [uploading, setUploading] = React.useState(false);
   const [transferred, setTransferred] = React.useState(0);
   const [post, setPost] = React.useState(null);
-  const [userData, setUserData] = React.useState({});
+  const [userData, setUserData] = React.useState(null);
 
 
   const { user, logout } = React.useContext(AuthContext);
@@ -48,31 +48,7 @@ export default function AddPostScreen({ route, navigation }) {
   
   React.useEffect(() => {
 getUser();
-    navigation.setOptions({
-      // title: 'POST',
-      headerRight:()=>(
-        < View >
-        <TouchableOpacity onPress={() => submitPost()} >
-          <View>
-            <Text style={{alignSelf:'flex-end',color:'#0077B5',marginRight:20,fontSize:24}} >POST</Text>
-            <View>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-      ),
-      headerLeft:()=>(
-        < View >
-        <TouchableOpacity onPress={() => navigation.navigate("FeedScreen")} >
-          <View>
-            <Text style={{alignSelf:'flex-end',color:'#0077B5',marginLeft:20,fontSize:20}} >CANCEL</Text>
-            <View>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-      )
-    });    const { action, imageUri } = route.params
+    ;    const { action, imageUri } = route.params
     setImage(imageUri)
 
   }, [])
@@ -118,9 +94,21 @@ getUser();
   };
 
   const submitPost = async () => {
+    setLoading(true)
     const imageUrl = await uploadImage();
     console.log('Image Url: ', imageUrl);
-    console.log('Post: ', post);
+    console.log('Post: ', {
+      userId: user.uid,
+      userName:userData.name,
+      userImg:userData.userImg,
+      title: title,
+      description: description,
+      price: price,
+      postImg: imageUrl,
+      postTime: firestore.Timestamp.fromDate(new Date()),
+      rating: 0,
+      reviews: 0,
+    });
 
     firestore()
       .collection('posts')
@@ -135,6 +123,7 @@ getUser();
         postTime: firestore.Timestamp.fromDate(new Date()),
         rating: 0,
         reviews: 0,
+        location:userData.location
       })
       .then(() => {
         firestore()
@@ -147,17 +136,17 @@ getUser();
           })
 
         console.log('Post Added!');
-        Alert.alert(
-          'Post published!',
-          'Your post has been published Successfully!',
-        );
+        // Alert.alert(
+        //   'Post published!',
+        //   'Your post has been published Successfully!',
+        // );
         setPost(null);
       })
       .catch((error) => {
         console.log('Something went wrong with added post to firestore.', error);
       });
 
-
+navigation.navigate("FeedScreen")
   }
 
   const uploadImage = async () => {
@@ -210,19 +199,21 @@ getUser();
     }
 
   };
-
+  // if (uploading) {
+  //   return <ActivityIndicator />;
+  // }
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <View >
         <View style={feedStyles.userInfo}>
 
           {/* <View> {image != null ? <Image source={{uri: image}} /> : null}        </View> */}
-          <Image source={{uri:userData.userImg}} style={feedStyles.userImg}>
+          <Image source={userData?{uri:userData.userImg}:PROFILE_PIC} style={feedStyles.userImg}>
 
           </Image>
           <View style={feedStyles.userName}>
             <Text style={feedStyles.userNameText}>
-             {userData.name}
+             {userData?userData.name:null}
             </Text>
 
           </View>
@@ -248,9 +239,21 @@ getUser();
         </ImageBackground>
 
       </View>
+      {uploading ? (
+          <View>
+            <Text>{transferred} % Completed!</Text>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        ) : (
       < View >
-       
-      </View>
+        <TouchableOpacity onPress={() => submitPost()} >
+          <View>
+            <Text style={{alignSelf:'flex-end',color:'#0077B5',marginRight:20,fontSize:24}} >POST</Text>
+            <View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>)}
       <FloatingAction
 
 
