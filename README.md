@@ -1,7 +1,7 @@
 # README #
-#ShopMedia
+# ShopMedia
 # React Native Mobile App with Firebase bacend Sevices
-## This app was developed for the IDEALIZE 2022 mobile app competition organized by AEISEC of UNiversity of Moratuwa
+## This app was developed for the IDEALIZE 2022 mobile app competition organized by AEISEC of University of Moratuwa
 
 ![ezgif com-gif-maker (10)](https://user-images.githubusercontent.com/77486691/183259532-0f20669f-3b13-4706-87f7-6b5dae3ae033.gif)
 
