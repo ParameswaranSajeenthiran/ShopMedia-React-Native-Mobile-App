@@ -1,29 +1,8 @@
 # README #
+#ShopMedia
+# React Native Mobile App with Firebase bacend Sevices
+## This app was developed for the IDEALIZE 2022 mobile app competition organized by AEISEC of UNiversity of Moratuwa
 
-This README would normally document whatever steps are necessary to get your application up and running.
+![ezgif com-gif-maker (10)](https://user-images.githubusercontent.com/77486691/183259532-0f20669f-3b13-4706-87f7-6b5dae3ae033.gif)
 
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+![ezgif com-gif-maker (11)](https://user-images.githubusercontent.com/77486691/183259516-d24ee718-15c7-4b4a-9174-d66a047d5c55.gif)
